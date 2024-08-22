@@ -37,11 +37,14 @@ function loadTable() {
             // $newLi.innerText = curItem.done ? "[x]: " : "[ ]: " + curItem.task;
             // $todosList.append($newLi);
             let $newRow = document.createElement("tr");
+            
+            let hexColor = colorIntToHexStr(curYarnData.color);
+
+            let $newTdHex = document.createElement("td");
+            $newTdHex.append(wrapWithEditLink(hexColor, curYarnData._id["$oid"]));
+            $newRow.append($newTdHex);
 
             let $newTdColor = document.createElement("td");
-            let hexColor = colorIntToHexStr(curYarnData.color);
-            //$newTdColor.innerText = hexColor;
-            $newTdColor.append(wrapWithEditLink(hexColor, curYarnData._id["$oid"]));
             $newTdColor.style.backgroundColor = hexColor;
             $newRow.append($newTdColor);
 

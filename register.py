@@ -24,6 +24,9 @@ db = get_database("yarn_databus")
 users_db = db["users"]
 try:
     user = User(users_db, args.username)
+    print("Found User, Updating Password")
     user["password_hash"] = generate_password_hash(password)
+    user.save()
 except ValueError:
+    print("Creating User")
     User.create_user(users_db, args.username, password)
