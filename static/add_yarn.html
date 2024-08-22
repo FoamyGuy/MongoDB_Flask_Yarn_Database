@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Add Yarn</title>
+    <style>
+        .input_block {
+            display: block;
+            padding: 8px 8px;
+        }
+
+        header {
+            padding-left: 8px;
+        }
+
+        .input_block label {
+            display: block;
+        }
+
+        button {
+            margin: 8px;
+            padding: 4px;
+        }
+
+        button {
+            font-size: 1.15em;
+        }
+
+        input, textarea, label, header {
+            font-size: 1.25em;
+        }
+
+        input[type=color] {
+            margin-left: 4px;
+            position: relative;
+            top: 3px;
+        }
+
+        textarea {
+            width: 226px;
+            height: 90px;
+        }
+
+        .error {
+            border: 2px solid red;
+        }
+    </style>
+</head>
+<body>
+<header>
+    <a href="/">Go Back</a>
+</header>
+<div class="input_block">
+    <label>Color</label>
+    <input id="color_input" type="text" value="000000" placeholder="Hex Color e.g. ff00ff"> <input id="color_picker"
+                                                                                                   type="color">
+</div>
+<div class="input_block">
+    <label>Amount</label>
+    <input id="amount_input" type="text" placeholder="Amount e.g. 2 skeins">
+</div>
+<div class="input_block">
+    <label>Notes</label>
+    <textarea id="notes_input"></textarea>
+</div>
+<button id="submit_add_btn">Submit + Add Another</button>
+<button id="submit_gototable_btn">Submit + Goto Table</button>
+
+
+<script>
+    const $submitAddBtn = document.querySelector("#submit_add_btn");
+    const $submitGotoTableBtn = document.querySelector("#submit_gototable_btn");
+    const $colorInput = document.querySelector("#color_input");
+    const $amountInput = document.querySelector("#amount_input");
+    const $notesInput = document.querySelector("#notes_input");
+    const $colorPicker = document.querySelector("#color_picker");
+
+    $colorPicker.addEventListener("change", function () {
+        console.log($colorPicker.value);
+        $colorInput.value = $colorPicker.value.substring(1);
+    })
+    $submitAddBtn.addEventListener("click", function () {
+        postYarn("add_another");
+    });
+    $submitGotoTableBtn.addEventListener("click", function () {
+        postYarn("goto_table");
+    });
+
+    async function postYarn(nextAction) {
+
+        let validInputs = true;
+        if ($colorInput.value === "") {
+            $colorInput.classList.add("error")
+            validInputs = false;
+        } else {
+            $colorInput.classList.remove("error")
+        }
+
+        if ($amountInput.value === "") {
+            $amountInput.classList.add("error")
+            validInputs = false;
+        } else {
+            $amountInput.classList.remove("error")
+        }
+
+        if (validInputs) {
+            const response = await fetch("/yarn", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    color: parseInt($colorInput.value, 16),
+                    amount: $amountInput.value,
+                    notes: $notesInput.value
+                }),
+            });
+            console.log(response);
+            if (response.status === 200) {
+                if (nextAction === "add_another") {
+                    $colorInput.value = "";
+                    $amountInput.value = "";
+                    $notesInput.value = "";
+
+                } else if (nextAction === "goto_table") {
+                    document.location = "/";
+                }
+            }
+
+        }
+    }
+</script>
+</body>
+</html>

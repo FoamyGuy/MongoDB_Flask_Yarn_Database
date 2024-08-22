@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Edit Yarn</title>
+    <style>
+        .input_block {
+            display: block;
+            padding: 8px 8px;
+        }
+        header{
+            padding-left: 8px;
+        }
+
+        .input_block label {
+            display: block;
+        }
+
+        button {
+            margin: 8px;
+            padding: 4px;
+        }
+
+        button{
+            font-size: 1.15em;
+        }
+        input, textarea, label, header, p {
+            font-size: 1.25em;
+        }
+        input[type=color]{
+            margin-left: 4px;
+            position: relative;
+            top: 3px;
+        }
+
+        textarea{
+            width: 226px;
+            height: 90px;
+        }
+        .danger_btn{
+            background-color: red;
+            border: 1px solid #222;
+            border-radius: 4px;
+            padding: 5px;
+            margin-left: 50px;
+        }
+
+
+        .hidden{
+            display: none;
+        }
+    </style>
+</head>
+<body>
+<header>
+    <a href="/static">Go Back</a>
+</header>
+<div class="input_block">
+    <label>Color</label>
+    <input id="color_input" type="text" placeholder="Hex Color e.g. ff00ff" value="{{ yarn_obj['hex_color'] }}"> <input id="color_picker" value="#{{ yarn_obj['hex_color'] }}" type="color">
+</div>
+<div class="input_block">
+    <label>Amount</label>
+    <input id="amount_input" type="text" placeholder="Amount e.g. 2 skeins" value="{{ yarn_obj['amount'] }}">
+</div>
+<div class="input_block">
+    <label>Notes</label>
+    <textarea id="notes_input">{{ yarn_obj['notes'] }}</textarea>
+</div>
+{#<button id="submit_add_btn">Submit + Add Another</button>#}
+<button id="submit_gototable_btn">Save + Goto Table</button>
+
+<button id="delete_btn" class="danger_btn">Delete Yarn</button>
+<section id="confirmation_section" class="hidden">
+    <p>Are you sure you want to delete this yarn? This action is permanent and irreversible!</p>
+    <button id="cancel_delete_btn">Nevermind</button>
+    <button id="confirm_delete_btn" class="danger_btn">Yes, Delete It</button>
+</section>
+<script>
+    //const $submitAddBtn = document.querySelector("#submit_add_btn");
+    const $submitGotoTableBtn = document.querySelector("#submit_gototable_btn");
+    const $colorInput = document.querySelector("#color_input");
+    const $amountInput = document.querySelector("#amount_input");
+    const $notesInput = document.querySelector("#notes_input");
+    const $colorPicker = document.querySelector("#color_picker");
+    const $deleteBtn = document.querySelector("#delete_btn");
+    const $cancelDeleteBtn = document.querySelector("#cancel_delete_btn");
+    const $confirmDeleteBtn = document.querySelector("#confirm_delete_btn");
+
+    const $confirmSection = document.querySelector("#confirmation_section");
+
+    $colorPicker.addEventListener("change", function () {
+        console.log($colorPicker.value);
+        $colorInput.value = $colorPicker.value.substring(1);
+    })
+    //$submitAddBtn.addEventListener("click", function () {
+    //    postYarn("add_another");
+    //});
+    $submitGotoTableBtn.addEventListener("click", function () {
+        postYarn("goto_table");
+    });
+    $deleteBtn.addEventListener("click", function(){
+        $confirmSection.classList.remove("hidden");
+    })
+    $cancelDeleteBtn.addEventListener("click", function(){
+        $confirmSection.classList.add("hidden");
+    });
+
+
+    async function postYarn(nextAction) {
+        const response = await fetch(document.location.toString(), {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                color: parseInt($colorInput.value, 16),
+                amount: $amountInput.value,
+                notes: $notesInput.value
+            }),
+        });
+        console.log(response);
+        if (response.status === 200) {
+            if (nextAction === "add_another") {
+                $colorInput.value = "";
+                $amountInput.value = "";
+                $notesInput.value = "";
+
+            } else if (nextAction === "goto_table") {
+                document.location = "/";
+            }
+        }
+    }
+
+    async function deleteYarn(nextAction) {
+        const response = await fetch(document.location.toString(), {
+            method: "DELETE",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                yarn_id: "{{ yarn_obj._id }}",
+            }),
+        });
+        console.log(response);
+        if (response.status === 200) {
+            if (nextAction === "add_another") {
+                $colorInput.value = "";
+                $amountInput.value = "";
+                $notesInput.value = "";
+
+            } else if (nextAction === "goto_table") {
+                document.location = "/";
+            }
+        }
+    }
+
+
+    $confirmDeleteBtn.addEventListener("click", function(){
+        deleteYarn("goto_table");
+    });
+</script>
+</body>
+</html>
