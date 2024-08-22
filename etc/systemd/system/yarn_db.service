@@ -1,0 +1,9 @@
+[Service]
+User=webapps
+Group=www-data
+WorkingDirectory=/webapps/MongoDB_Flask_Yarn_Database
+Environment="PATH=/opt/yarn_db_venv/bin"
+ExecStart=/opt/yarn_db_venv/bin/gunicorn --workers 3 --bind unix:gunicorn.sock -m 007 app:app
+
+[Install]
+WantedBy=multi-user.target
