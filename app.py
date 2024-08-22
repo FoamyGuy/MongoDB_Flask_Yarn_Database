@@ -39,10 +39,6 @@ def load_user(user_id):
 @login_required
 def index():
 
-    # print(dir(user))
-    # print(user['username'])
-    # #user.set_password("QgsR4Sm2W-A")
-    # print(user.check_password("QgsR4Sm2W-A"))
     return send_from_directory("static", "index.html")
 
 
